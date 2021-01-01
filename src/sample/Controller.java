@@ -11,12 +11,15 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Controller {
 
     int X_SIZE;
     int Y_SIZE;
+
 
     @FXML
     private Button load_button;
@@ -33,7 +36,9 @@ public class Controller {
         if(of.on == -1 || of.tw == -1) return new Image("blank.png");
         return new Image("s"+Math.min(of.on, of.tw) + ""+Math.max(of.on, of.tw) +".png");
     }
-
+    Image get_watery(Pipe of) {
+        return new Image("w"+Math.min(of.on, of.tw) + ""+Math.max(of.on, of.tw) +".png");
+    }
     void load_level(String name) {
         level.getChildren().clear();
         //level.getChildren().removeAll(level.getChildren());
@@ -74,6 +79,9 @@ public class Controller {
                 //iv.setFitWidth(100);
                 //iv.setFitHeight(100);
                 iv.setOnMouseClicked(mouseEvent -> {
+                    // call our logics, check if they are connected afterwards
+                    // rotot.rotate(i,j)
+                    // if(connected) gimme path
                     // go to new state
                     int[] ids = (int[]) iv.getUserData();
                     //if(ids[0] == -1 || ids[1] == -1) return;
@@ -82,6 +90,14 @@ public class Controller {
                     target.on = (target.on + 1) % 4;
                     target.tw = (target.tw + 1) % 4;
                     iv.setImage(get_img(target));
+                    Optional<ArrayList<Solver.Pair>> o = Solver.connected(pipes, X_SIZE, Y_SIZE);
+                    if(o.isEmpty()) return;
+                    // color 'em blue
+                    for(Solver.Pair x : o.get()) {
+                        // update pair x
+                        ImageView iw = new ImageView(get_watery(pipes[x.first][x.second]));
+                        level.add(iw, x.second+1, x.first+1);
+                    }
                 });
                 level.add(iv, j+1, i+1);
                 //GridPane.setMargin(iv, new Insets(-1, -1, -1, -1));
