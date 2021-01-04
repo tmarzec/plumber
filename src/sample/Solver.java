@@ -45,13 +45,13 @@ public class Solver {
             }
         }
         List<Pair> q = new LinkedList<>();
-        if(pipes[0][0].on != 0 && pipes[0][0].tw != 0)
+        if(pipes[0][0].dirs.get(0) != 0)
             return Optional.empty();
         q.add(new Pair(0, 0));
         boolean good = false;
         while(!q.isEmpty()) {
             Pair cur = q.get(0);
-            //System.out.println("visiting " + cur.first + " " + cur.second);
+            System.out.println("visiting " + cur.first + " " + cur.second);
             vis[cur.first][cur.second] = true;
             q.remove(0);
             Pair one = get_next(cur.first, cur.second, pipes[cur.first][cur.second].on);
@@ -68,8 +68,6 @@ public class Solver {
             } else if(good(tw, x, y, vis) && is_edge(cur, tw, pipes)){
                 p[tw.first][tw.second] = cur;
                 q.add(tw);
-                //
-                System.out.println("added " + tw.first + " " + tw.second);
             }
         }
         if(good) {

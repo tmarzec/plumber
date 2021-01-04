@@ -11,9 +11,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class Controller {
 
@@ -33,11 +31,23 @@ public class Controller {
     Pipe[][] pipes;
 
     Image get_img(Pipe of) {
-        if(of.on == -1 || of.tw == -1) return new Image("blank.png");
-        return new Image("s"+Math.min(of.on, of.tw) + ""+Math.max(of.on, of.tw) +".png");
+        if(of.dirs.isEmpty()) return new Image("blank.png");
+        StringBuilder sb = new StringBuilder();
+        sb.append('s');
+        for(int x : of.dirs) {
+            sb.append(x);
+        }
+        sb.append(".png");
+        return new Image(new String(sb));
     }
     Image get_watery(Pipe of) {
-        return new Image("w"+Math.min(of.on, of.tw) + ""+Math.max(of.on, of.tw) +".png");
+        StringBuilder sb = new StringBuilder();
+        sb.append('w');
+        for(int x : of.dirs) {
+            sb.append(x);
+        }
+        sb.append(".png");
+        return new Image(new String(sb));
     }
     void load_level(String name) {
         level.getChildren().clear();
@@ -52,8 +62,11 @@ public class Controller {
                 for(int j = 0; j < Y_SIZE; j++) {
                     // pair is enough for now
                     pipes[i][j] = new Pipe();
-                    pipes[i][j].on = sc.nextInt();
-                    pipes[i][j].tw = sc.nextInt();
+                    for(int k = 0; k < 3; k++) {
+                        int a = sc.nextInt();
+                        if(a != -1) pipes[i][j].dirs.add(a);
+                    }
+                    Collections.sort(pipes[i][j].dirs);
                 }
             }
         } catch (Exception f) {
@@ -86,9 +99,11 @@ public class Controller {
                     int[] ids = (int[]) iv.getUserData();
                     //if(ids[0] == -1 || ids[1] == -1) return;
                     Pipe target = pipes[ids[0]][ids[1]];
-                    if(target.on == -1 || target.tw == -1) return;
-                    target.on = (target.on + 1) % 4;
-                    target.tw = (target.tw + 1) % 4;
+                    if(target.dirs.isEmpty()) return;
+                    for(int k = 0; k < target.dirs.size(); k++) {
+                        target.dirs.set(k, (target.dirs.get(k)+1)%4);
+                    }
+                    Collections.sort(target.dirs);
                     iv.setImage(get_img(target));
                     Optional<ArrayList<Solver.Pair>> o = Solver.connected(pipes, X_SIZE, Y_SIZE);
                     if(o.isEmpty()) return;

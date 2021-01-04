@@ -1,5 +1,8 @@
 package sample;
 
+import java.util.ArrayList;
+
 public class Pipe {
-    int on, tw;
+    ArrayList<Integer> dirs;
+    //int on, tw;
 }
