@@ -57,13 +57,17 @@ public class Controller {
             Scanner sc = new Scanner(new File(name));
             X_SIZE = sc.nextInt();
             Y_SIZE = sc.nextInt();
+            int am = sc.nextInt();
             pipes = new Pipe[X_SIZE][Y_SIZE];
             for(int i = 0; i < X_SIZE; i++) {
                 for(int j = 0; j < Y_SIZE; j++) {
                     // pair is enough for now
                     pipes[i][j] = new Pipe();
-                    for(int k = 0; k < 3; k++) {
+                    for(int k = 0; k < am; k++) {
                         int a = sc.nextInt();
+                        if(a == -1 && am == 2) {
+                            break;
+                        }
                         if(a != -1) pipes[i][j].dirs.add(a);
                     }
                     Collections.sort(pipes[i][j].dirs);
@@ -77,8 +81,8 @@ public class Controller {
         //mainStage.setY(500);
         mainStage.setWidth(100*Y_SIZE + 200);
         mainStage.setHeight(100*X_SIZE + 200);
-        level.setPrefHeight((X_SIZE-1) * 110);
-        level.setPrefWidth((Y_SIZE-1) * 110);
+        level.setPrefHeight((X_SIZE) * 110);
+        level.setPrefWidth((Y_SIZE) * 110);
         level.setGridLinesVisible(true);
         //level.setHgap(3);
         //level.setVgap(3);
@@ -114,7 +118,7 @@ public class Controller {
                         level.add(iw, x.second+1, x.first+1);
                     }
                 });
-                level.add(iv, j+1, i+1);
+                level.add(iv, j+2, i+2);
                 //GridPane.setMargin(iv, new Insets(-1, -1, -1, -1));
 
             }
@@ -125,20 +129,13 @@ public class Controller {
 
     @FXML
     void load_next(ActionEvent event) {
-        load_level("first.lvl");
+        load_level("11.lvl");
     }
 
     public Stage mainStage;
 
     public void magic() {
-        //level.prefHeightProperty().bind(Bindings.size(itemListProperty).multiply(100));;
-        //ColumnConstraints cc = new ColumnConstraints(100);
-        //level.getColumnConstraints().addAll(cc, cc);
-        //RowConstraints rc = new RowConstraints(100);
-        //level.getRowConstraints().addAll(rc, rc);
-        //load level?
-        load_level("0.lvl");
-        //mainStage.setX();
+        load_level("10.lvl");
     }
 
 }

@@ -11,6 +11,28 @@ public class Solver {
             this.first = first;
             this.second = second;
         }
+
+        @Override
+        public String toString() {
+            return "Pair{" +
+                    "first=" + first +
+                    ", second=" + second +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pair pair = (Pair) o;
+            return first == pair.first &&
+                    second == pair.second;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(first, second);
+        }
     }
     static Pair get_next(int i, int j, int to) {
         switch (to){
@@ -25,23 +47,28 @@ public class Solver {
         }
         return null;
     }
-
-    static boolean good(Pair par, int x, int y, Boolean[][] vis) {
-        return par != null && par.first >= 0 && par.first < x && par.second >= 0 && par.second < y && !vis[par.first][par.second];
-    }
     static boolean is_edge(Pair from, Pair to, Pipe[][] pipes) {
-        Pair poss1 = get_next(to.first, to.second, pipes[to.first][to.second].on);
-        Pair poss2 = get_next(to.first, to.second, pipes[to.first][to.second].tw);
-        return ((poss1 != null && poss1.first == from.first && poss1.second == from.second)||(poss2 != null && poss2.first == from.first && poss2.second == from.second));
+        if(from.first == to.first -1 && from.second == to.second) {
+            return pipes[to.first][to.second].dirs.contains(0) && pipes[from.first][from.second].dirs.contains(2);
+        }
+        else if(from.first == to.first && from.second == to.second - 1) {
+            return pipes[to.first][to.second].dirs.contains(3) && pipes[from.first][from.second].dirs.contains(1);
+        }
+        return is_edge(to, from, pipes);
+    }
+    static boolean good(Pair par, int x, int y) {
+        return par != null && par.first >= 0 && par.first < x && par.second >= 0 && par.second < y;
     }
     static Optional<ArrayList<Pair>> connected(Pipe[][] pipes, int x, int y) {
         // from (-1, 0) to (x-2, y)
         // parent of (i,j)
-        Pair[][] p = new Pair[x][y];
-        Boolean[][] vis = new Boolean[x][y];
+        Set<Pair>[][] p = new HashSet[x][y];
+        int[][] vis = new int[x][y];
+        int[][] deg = new int[x][y];
         for(int i = 0; i < x; i++) {
             for(int j = 0; j < y; j++) {
-                vis[i][j] = false;
+                vis[i][j] = 0;
+                p[i][j] = new HashSet<>();
             }
         }
         List<Pair> q = new LinkedList<>();
@@ -49,37 +76,101 @@ public class Solver {
             return Optional.empty();
         q.add(new Pair(0, 0));
         boolean good = false;
+        deg[0][0] = 1;
         while(!q.isEmpty()) {
             Pair cur = q.get(0);
             System.out.println("visiting " + cur.first + " " + cur.second);
-            vis[cur.first][cur.second] = true;
-            q.remove(0);
-            Pair one = get_next(cur.first, cur.second, pipes[cur.first][cur.second].on);
-            Pair tw = get_next(cur.first, cur.second, pipes[cur.first][cur.second].tw);
-            if(tw == null && one == null) continue;
-
-            if((one != null && one.first == x-2 && one.second == y) || (tw != null && tw.first == x-2 && tw.second == y)) {
-                good = true;
-                break;
+            if(cur.first == 4 && cur.second == 9) {
+                System.out.println("alkamakkf");
             }
-            if(good(one, x, y, vis) && is_edge(cur, one, pipes)) {
-                p[one.first][one.second] = cur;
-                q.add(one);
-            } else if(good(tw, x, y, vis) && is_edge(cur, tw, pipes)){
-                p[tw.first][tw.second] = cur;
-                q.add(tw);
+            vis[cur.first][cur.second] = 1;
+            q.remove(0);
+
+            for(int dir : pipes[cur.first][cur.second].dirs) {
+                Pair next = get_next(cur.first, cur.second, dir);
+                if(next == null) {
+                    //handle err?
+                    System.out.println("Bad, next == null");
+                    throw new RuntimeException();
+                }
+
+                //System.out.println("Next is: " + next.first + " " + next.second);
+                if(next.first == x-2 && next.second == y) {
+                    good = true;
+                    deg[cur.first][cur.second] ++;
+                }
+                if(!good(next, x, y)) continue;
+                if(!is_edge(cur, next, pipes)) continue;
+                deg[next.first][next.second] ++;
+                if(vis[next.first][next.second] != 1) p[next.first][next.second].add(cur);
+                if(vis[next.first][next.second] != 0) continue;
+                q.add(next);
+                vis[next.first][next.second] = 2;
             }
         }
         if(good) {
             System.out.println("good");
             // go from (x-2, y-1) to beg
-            ArrayList<Pair> res = new ArrayList<>();
+            Set<Pair> res = new HashSet<>();
+            List<Pair> qq = new LinkedList<>();
             Pair cur = new Pair(x-2, y-1);
-            while(cur != null) {
-                res.add(cur);
-                cur = p[cur.first][cur.second];
+            qq.add(cur);
+            for(int i = 0; i < x; i++) {
+                for(int j = 0; j < y; j++) {
+                    //deg[i][j] = 0;
+                    vis[i][j] = 0;
+                }
             }
-            return Optional.of(res);
+            while(!qq.isEmpty()) {
+                Pair z = qq.get(0);
+                if(vis[z.first][z.second] == 1) {
+                    qq.remove(0);
+                    continue;
+                }
+                vis[z.first][z.second] = 1;
+                res.add(z);
+                qq.remove(0);
+                for(Pair xo : p[z.first][z.second])
+                {
+
+                    if(vis[xo.first][xo.second] == 0) {
+                        qq.add(xo);
+                    }
+                    //vis[xo.first][xo.second] = 1;
+                }
+                qq.addAll(p[z.first][z.second]);
+            }
+            boolean exists = false;
+            for(Pair xo : res) {
+                if(pipes[xo.first][xo.second].dirs.size() == 3) {
+                    exists = true;
+                    if(deg[xo.first][xo.second] != 3)
+                    return Optional.empty();
+                }
+
+            }
+            // if
+            if(exists) {
+                //check for it
+                for(int i = 0; i < x; i++) {
+                    for(int j = 0; j < y; j++) {
+                        Pair xo = new Pair(i,j);
+                        if(pipes[xo.first][xo.second].dirs.size() == 2 && deg[xo.first][xo.second] != 2) {
+                            return Optional.empty();
+                        }
+                    }
+                }
+                ArrayList<Pair> reto = new ArrayList<>();
+                // put there all nodes
+                for(int i = 0; i < x; i++) {
+                    for(int j = 0; j < y; j++) {
+                        if(pipes[i][j].dirs.size() > 0) reto.add(new Pair(i, j));
+                    }
+                }
+                return Optional.of(reto);
+            }
+            ArrayList<Pair> reto = new ArrayList<>(res);
+            return Optional.of(reto);
         } else {
             System.out.println("bad");
             return Optional.empty();
