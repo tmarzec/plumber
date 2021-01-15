@@ -1,0 +1,5 @@
+.bodybg{
+    /* Center and scale the image nicely */
+    -fx-background-size: cover;
+
+}
