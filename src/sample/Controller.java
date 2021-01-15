@@ -1,22 +1,23 @@
 package sample;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ObservableIntegerValue;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Controller {
@@ -41,7 +42,7 @@ public class Controller {
     Text count_holder = new Text();
     Text level_holder = new Text();
     int counter = 0;
-
+    int latest = 0;
     Image get_img(Pipe of) {
         if(of.dirs.isEmpty()) return new Image("blank.png");
         StringBuilder sb = new StringBuilder();
@@ -63,16 +64,29 @@ public class Controller {
     }
 
     void set_level_act(ActionEvent ae) {
-        System.out.println("ala");
+        // load levelchoosewinwow
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("levelChoose.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Hello World");
+            stage.setScene(new Scene(root, 490, 400));
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+            //sth happened?
+            load_level(((LevelChooseWindow)loader.getController()).lvl.id);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    void load_level(String name) {
+    void load_level(int nme) {
+        latest = nme;
         level.getChildren().clear();
         counter = 0;
-        level_holder.setText("Level "+name);
-        level_holder.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 19));
-        level.add(level_holder, 6, 1);
-        name = "levels/" + name + ".lvl";
+
+        String name = "levels/" + nme + ".lvl";
         try {
             Scanner sc = new Scanner(new File(name));
             X_SIZE = sc.nextInt();
@@ -160,19 +174,24 @@ public class Controller {
         level_button.setAlignment(Pos.CENTER);
         level_button.setTextAlignment(TextAlignment.CENTER);
         level_button.setOnAction(this::set_level_act);
+
+        level_holder.setText("Level "+nme);
+        level_holder.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 19));
+        level.add(level_holder, Y_SIZE-1, 1);
     }
 
 
     @FXML
     void load_next(ActionEvent event) {
-        load_level("10");
+        if(latest != 30)
+        load_level(latest+1);
     }
 
     public Stage mainStage;
 
     public void magic() {
 
-        load_level("9");
+        load_level(1);
     }
 
 }

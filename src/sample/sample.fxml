@@ -25,7 +25,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
             </GridPane>
-            <Button fx:id="load_button" mnemonicParsing="false" onAction="#load_next" text="Button" />
+            <Button fx:id="load_button" mnemonicParsing="false" onAction="#load_next" text="next level" />
          </children>
       </FlowPane>
    </children>

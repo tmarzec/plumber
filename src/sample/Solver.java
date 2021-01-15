@@ -104,7 +104,7 @@ public class Solver {
             }
         }
         if(good) {
-            System.out.println("good");
+            // System.out.println("good");
             boolean exists = false;
             for(Pair xo : all) {
                 if(pipes[xo.first][xo.second].dirs.size() == 3) {
@@ -117,19 +117,16 @@ public class Solver {
             // if
             if(exists) {
                 //check for it
-                for(int i = 0; i < x; i++) {
-                    for(int j = 0; j < y; j++) {
-                        Pair xo = new Pair(i,j);
-                        if(pipes[xo.first][xo.second].dirs.size() == 2 && deg[xo.first][xo.second] != 2) {
-                            return Optional.empty();
-                        }
+                for(Pair xo : all) {
+                    if(pipes[xo.first][xo.second].dirs.size() == 2 && deg[xo.first][xo.second] != 2) {
+                        return Optional.empty();
                     }
                 }
                 return Optional.of(all);
             }
             return Optional.of(all);
         } else {
-            System.out.println("bad");
+            // System.out.println("bad");
             return Optional.empty();
         }
     }
