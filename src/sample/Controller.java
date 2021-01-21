@@ -66,7 +66,7 @@ public class Controller {
     void set_level_act(ActionEvent ae) {
         // load levelchoosewinwow
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("levelChoose.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../levelChoose.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Hello World");
@@ -75,7 +75,9 @@ public class Controller {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
             //sth happened?
-            load_level(((LevelChooseWindow)loader.getController()).lvl.id);
+            LevelChooseWindow.Level lv = ((LevelChooseWindow)loader.getController()).lvl;
+            if(lv != null)
+                load_level(lv.id);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,7 +114,7 @@ public class Controller {
             System.exit(-1);
         }
         mainStage.setWidth(100*Y_SIZE + 200);
-        mainStage.setHeight(100*X_SIZE + 200);
+        mainStage.setHeight(100*X_SIZE + 200+30);
         level.setPrefHeight((X_SIZE) * 110);
         level.setPrefWidth((Y_SIZE) * 110);
         level.setPadding(new Insets(10, 10, 10, 10));
