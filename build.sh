@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -r cmp/
+rm -r cmp/ 2>/dev/null
 mkdir cmp
 cp -r resources/* cmp
-javac -d cmp --module-path ${PATH_TO_FX} --add-modules javafx.controls,javafx.fxml src/sample/*.java
+javac -d cmp --module-path javafx-sdk-16/lib --add-modules javafx.controls,javafx.fxml src/sample/*.java
